@@ -7,11 +7,11 @@ This package is helper package for github.com/tealeg/xlsx. This package provides
 
    file, _ := xlsx.OpenFile("test.xlsx")
 
-   range := xlsxrange.New(file.Sheet["Sheet1"])
-   range.Select("E5:F6")
+   aRange := xlsxrange.New(file.Sheet["Sheet1"])
+   aRange.Select("E5:F6")
 
-   cell := range.GetCell(1, 2) // Relative position from E5
-   cells := range.GetCells()   // [][]*xlsx.Cell
+   cell := aRange.GetCell(1, 2) // Relative position from E5
+   cells := aRange.GetCells()   // [][]*xlsx.Cell
 
 License
 -----------
