@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-var reg1 *regexp.Regexp = regexp.MustCompile("^([A-Z]+|[1-9][0-9]*|[A-Z]+[1-9][0-9]*)(:([A-Z]+|[1-9][0-9]*|[A-Z]+[1-9][0-9]*))?$")
-var reg2 *regexp.Regexp = regexp.MustCompile("([A-Z]+|[1-9][0-9]*)")
-var reg3 *regexp.Regexp = regexp.MustCompile("([A-Z]+)")
-var reg4 *regexp.Regexp = regexp.MustCompile("([1-9][0-9]*)")
+var reg1 *regexp.Regexp = regexp.MustCompile(`^(\$?[A-Z]+|\$?[1-9][0-9]*|\$?[A-Z]+\$?[1-9][0-9]*)(:(\$?[A-Z]+|\$?[1-9][0-9]*|\$?[A-Z]+\$?[1-9][0-9]*))?$`)
+var reg2 *regexp.Regexp = regexp.MustCompile(`\$?([A-Z]+|\$?[1-9][0-9]*)`)
+var reg3 *regexp.Regexp = regexp.MustCompile(`\$?([A-Z]+)`)
+var reg4 *regexp.Regexp = regexp.MustCompile(`\$?([1-9][0-9]*)`)
 
 // ParseA1Notation parses A1 notation and return sheet name and range.
 //
@@ -44,6 +44,9 @@ func ParseA1Notation(notation string) (string, []int, error) {
 						}
 					}
 				} else if reg4.MatchString(value) {
+					if strings.HasPrefix(value, "$") {
+						value = value[1:]
+					}
 					if i == 0 {
 						intValue, err := strconv.ParseInt(value, 10, 64)
 						if err != nil {

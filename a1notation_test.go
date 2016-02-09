@@ -86,6 +86,35 @@ func TestParseA1Notation_6(t *testing.T) {
 	}
 }
 
+func TestParseA1Notation_7(t *testing.T) {
+	sheetName, rangeValues, err := ParseA1Notation("$B2:D$5")
+	if err != nil {
+		t.Errorf("Error should be nil but %v", err)
+		return
+	}
+	if sheetName != "" {
+		t.Errorf("Sheet name should be empty but %s", sheetName)
+	}
+	if rangeValues[0] != 2 || rangeValues[1] != 2 || rangeValues[2] != 4 || rangeValues[3] != 3 {
+		t.Errorf("Range should be [2, 2, 4, 3] but [%d, %d, %d, %d]", rangeValues[0], rangeValues[1], rangeValues[2], rangeValues[3])
+	}
+}
+
+func TestParseA1Notation_8(t *testing.T) {
+	sheetName, rangeValues, err := ParseA1Notation("$B$2:$D$5")
+
+	if err != nil {
+		t.Errorf("Error should be nil but %v", err)
+		return
+	}
+	if sheetName != "" {
+		t.Errorf("Sheet name should be empty but %s", sheetName)
+	}
+	if rangeValues[0] != 2 || rangeValues[1] != 2 || rangeValues[2] != 4 || rangeValues[3] != 3 {
+		t.Errorf("Range should be [2, 2, 4, 3] but [%d, %d, %d, %d]", rangeValues[0], rangeValues[1], rangeValues[2], rangeValues[3])
+	}
+}
+
 func TestDivideA1Notation_1(t *testing.T) {
 	sheet, notation := divideA1Notation("filename!A1:B5")
 	if sheet != "filename" || notation != "A1:B5" {

@@ -42,8 +42,12 @@ func ColumnStrToNumber(s string) int {
 	}
 	result := 0
 	var base = int("A"[0])
+	var last = int("Z"[0])
 	for i := 0; i < len(s); i++ {
-		result = result*26 + (int(s[i]) - base + 1)
+		code := int(s[i])
+		if base <= code && code <= last {
+			result = result*26 + (code - base + 1)
+		}
 	}
 	return result
 }
