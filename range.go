@@ -5,22 +5,6 @@ import (
 	"github.com/tealeg/xlsx"
 )
 
-func max(x, y int) int {
-	if x > y {
-		return x
-	} else {
-		return y
-	}
-}
-
-func min(x, y int) int {
-	if x < y {
-		return x
-	} else {
-		return y
-	}
-}
-
 // Range struct treats range of spreadsheet cells
 type Range struct {
 	File       *xlsx.File  // Target file
@@ -36,7 +20,26 @@ const (
 	AllColumns = -1 // All columns in sheet
 )
 
-func New(sheet *xlsx.Sheet) *Range {
+// NewWithFile creates Range instance
+// It can accept notation parameters. See Range.Select for detail.
+func NewWithFile(file *xlsx.File, notation ...interface{}) *Range {
+	result := Range{
+		File:       file,
+		Sheet:      nil,
+		Row:        1,
+		Column:     1,
+		NumRows:    AllRows,
+		NumColumns: AllColumns,
+	}
+	if len(notation) > 0 {
+		result.Select(notation...)
+	}
+	return &result
+}
+
+// New creates Range instance
+// It can accept notation parameters. See Range.Select for detail.
+func New(sheet *xlsx.Sheet, notation ...interface{}) *Range {
 	result := Range{
 		File:       sheet.File,
 		Sheet:      sheet,
@@ -45,9 +48,13 @@ func New(sheet *xlsx.Sheet) *Range {
 		NumRows:    AllRows,
 		NumColumns: AllColumns,
 	}
+	if len(notation) > 0 {
+		result.Select(notation...)
+	}
 	return &result
 }
 
+// SetSheet sets current sheet by name
 func (r *Range) SetSheet(name string) error {
 	sheet, ok := r.File.Sheet[name]
 	if ok {

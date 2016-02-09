@@ -56,9 +56,8 @@ func TestNewRange(t *testing.T) {
 
 func TestSelectByR1C1(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := New(file.Sheet["Sheet 1"], 5, 4, 3, 2)
 
-	aRange.Select(5, 4, 3, 2)
 	if aRange.Row != 5 {
 		t.Errorf("row should be 5, but %d\n", aRange.Row)
 	}
@@ -75,9 +74,8 @@ func TestSelectByR1C1(t *testing.T) {
 
 func TestSelectSingleCellByR1C1(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := New(file.Sheet["Sheet 1"], 5, 4)
 
-	aRange.Select(5, 4)
 	if aRange.Row != 5 {
 		t.Errorf("row should be 5, but %d\n", aRange.Row)
 	}
@@ -94,9 +92,8 @@ func TestSelectSingleCellByR1C1(t *testing.T) {
 
 func TestSelectByA1Notation(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := New(file.Sheet["Sheet 1"], "D5:F6")
 
-	aRange.Select("D5:F6")
 	if aRange.Row != 5 {
 		t.Errorf("row should be 5, but %d\n", aRange.Row)
 	}
@@ -113,9 +110,8 @@ func TestSelectByA1Notation(t *testing.T) {
 
 func TestSelectByA1NotationWithSheetName(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := NewWithFile(file, "Sheet 2!D5:F6")
 
-	aRange.Select("Sheet 2!D5:F6")
 	if aRange.Sheet.Name != "Sheet 2" {
 		t.Errorf("")
 	}
@@ -135,9 +131,8 @@ func TestSelectByA1NotationWithSheetName(t *testing.T) {
 
 func TestReset(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := New(file.Sheet["Sheet 1"], 5, 4, 3, 2)
 
-	aRange.Select(5, 4, 3, 2)
 	aRange.Reset()
 	if aRange.Row != 1 {
 		t.Errorf("reseted row should be 1, but %d\n", aRange.Row)
@@ -180,9 +175,8 @@ func TestGetCell(t *testing.T) {
 
 func TestGetCells(t *testing.T) {
 	file := createFile()
-	aRange := New(file.Sheet["Sheet 1"])
+	aRange := New(file.Sheet["Sheet 1"], 5, 4, 3, 2)
 
-	aRange.Select(5, 4, 3, 2)
 	cells := aRange.GetCells()
 
 	if len(cells) != 3 {

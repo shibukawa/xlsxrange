@@ -105,7 +105,7 @@ func ParseA1Notation(notation string) (string, []int, error) {
 		ranges := []int{newRow, newColumn, newNumRows, newNumColumns}
 		return sheetName, ranges, nil
 	}
-	return sheetName, nil, fmt.Errorf(`"%s is invalid A1Notation"`)
+	return sheetName, nil, fmt.Errorf(`'%s' is invalid A1Notation`, notation)
 }
 
 func divideA1Notation(notation string) (string, string) {
