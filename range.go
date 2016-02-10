@@ -1,8 +1,10 @@
 package xlsxrange
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/tealeg/xlsx"
+	"strconv"
 )
 
 // Range struct treats range of spreadsheet cells
@@ -173,4 +175,34 @@ func (r *Range) String() string {
 		return columnLabel
 	}
 	return fmt.Sprintf("%s%d:%s, %s", columnLabel, r.Row, columnLabel, columnLabel)
+}
+
+func (r *Range) Format(includeSheetName bool) string {
+	var buffer bytes.Buffer
+	if includeSheetName {
+		buffer.WriteString(r.Sheet.Name)
+		buffer.WriteByte('!')
+	}
+	if r.NumRows == AllRows && r.NumColumns == AllColumns {
+		buffer.WriteString("1:1048576")
+	} else if r.NumRows == AllRows {
+		buffer.WriteString(NumberToColumnStr(r.Column))
+		buffer.WriteByte(':')
+		buffer.WriteString(NumberToColumnStr(r.Column + r.NumColumns - 1))
+	} else if r.NumColumns == AllColumns {
+		buffer.WriteString(strconv.Itoa(r.Row))
+		buffer.WriteByte(':')
+		buffer.WriteString(strconv.Itoa(r.Row + r.NumRows - 1))
+	} else if r.NumColumns == 1 && r.NumRows == 1 {
+		buffer.WriteString(NumberToColumnStr(r.Column))
+		buffer.WriteString(strconv.Itoa(r.Row))
+	} else {
+		buffer.WriteString(NumberToColumnStr(r.Column))
+		buffer.WriteString(strconv.Itoa(r.Row))
+		buffer.WriteByte(':')
+		buffer.WriteString(NumberToColumnStr(r.Column + r.NumColumns - 1))
+		buffer.WriteString(strconv.Itoa(r.Row + r.NumRows - 1))
+	}
+
+	return buffer.String()
 }

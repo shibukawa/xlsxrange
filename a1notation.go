@@ -7,10 +7,9 @@ import (
 	"strings"
 )
 
-var reg1 *regexp.Regexp = regexp.MustCompile(`^(\$?[A-Z]+|\$?[1-9][0-9]*|\$?[A-Z]+\$?[1-9][0-9]*)(:(\$?[A-Z]+|\$?[1-9][0-9]*|\$?[A-Z]+\$?[1-9][0-9]*))?$`)
-var reg2 *regexp.Regexp = regexp.MustCompile(`\$?([A-Z]+|\$?[1-9][0-9]*)`)
-var reg3 *regexp.Regexp = regexp.MustCompile(`\$?([A-Z]+)`)
-var reg4 *regexp.Regexp = regexp.MustCompile(`\$?([1-9][0-9]*)`)
+var allRowsPattern *regexp.Regexp = regexp.MustCompile(`^\$?([A-Z]+):\$?([A-Z]+)$`)
+var allColsPattern *regexp.Regexp = regexp.MustCompile(`^\$?([1-9][0-9]*):\$?([1-9][0-9]*)$`)
+var otherPattern *regexp.Regexp = regexp.MustCompile(`^\$?([A-Z]+)\$?([1-9][0-9]*)(:\$?([A-Z]+)\$?([1-9][0-9]*))?$`)
 
 // ParseA1Notation parses A1 notation and return sheet name and range.
 //
@@ -22,86 +21,53 @@ var reg4 *regexp.Regexp = regexp.MustCompile(`\$?([1-9][0-9]*)`)
 func ParseA1Notation(notation string) (string, []int, error) {
 	sheetName, rangeNotation := divideA1Notation(notation)
 	rangeNotation = strings.ToUpper(rangeNotation)
-	if reg1.MatchString(rangeNotation) {
-		res := strings.Split(rangeNotation, ":")
-		newRow := 0
-		newColumn := 0
-		newNumRows := 0
-		newNumColumns := 0
 
-		for i, subStr := range res {
-			for _, value := range reg2.FindAllString(subStr, -1) {
-				if reg3.MatchString(value) {
-					if i == 0 {
-						newColumn = ColumnStrToNumber(value)
-					} else {
-						col := ColumnStrToNumber(value)
-						if newColumn < col {
-							newNumColumns = col - newColumn + 1
-						} else {
-							newNumColumns = newColumn - col + 1
-							newColumn = col
-						}
-					}
-				} else if reg4.MatchString(value) {
-					if strings.HasPrefix(value, "$") {
-						value = value[1:]
-					}
-					if i == 0 {
-						intValue, err := strconv.ParseInt(value, 10, 64)
-						if err != nil {
-							newRow = 0
-						} else {
-							newRow = int(intValue)
-						}
-					} else {
-						row := 0
-						intValue, err := strconv.ParseInt(value, 10, 64)
-						if err == nil {
-							row = int(intValue)
-						}
-						if newRow < row {
-							newNumRows = row - newRow + 1
-						} else {
-							newNumRows = newRow - row + 1
-							newRow = row
-						}
-					}
+	match := false
+
+	newRow := 0
+	newColumn := 0
+	newNumRows := 0
+	newNumColumns := 0
+
+	subStrings1 := allRowsPattern.FindStringSubmatch(rangeNotation)
+	if len(subStrings1) > 0 {
+		match = true
+		// A:B pattern
+		newRow = 1
+		newColumn = ColumnStrToNumber(subStrings1[1])
+		newNumRows = AllRows
+		newNumColumns = ColumnStrToNumber(subStrings1[2]) - newColumn + 1
+	} else {
+		subStrings2 := allColsPattern.FindStringSubmatch(rangeNotation)
+		if len(subStrings2) > 0 {
+			match = true
+			// 1:2 pattern
+			newRow, _ = strconv.Atoi(subStrings2[1])
+			newColumn = 1
+			newNumRows, _ = strconv.Atoi(subStrings2[2])
+			newNumRows = newNumRows - newRow + 1
+			newNumColumns = AllColumns
+		} else {
+			subStrings3 := otherPattern.FindStringSubmatch(rangeNotation)
+			if len(subStrings3) > 0 {
+				match = true
+				newRow, _ = strconv.Atoi(subStrings3[2])
+				newColumn = ColumnStrToNumber(subStrings3[1])
+				if subStrings3[3] != "" {
+					// A2:B4 pattern
+					newNumRows, _ = strconv.Atoi(subStrings3[5])
+					newNumRows = newNumRows - newRow + 1
+					newNumColumns = ColumnStrToNumber(subStrings3[4]) - newColumn + 1
+				} else {
+					// A2 pattern
+					newNumRows = 1
+					newNumColumns = 1
 				}
 			}
 		}
+	}
 
-		if newRow == 0 {
-			if newNumRows == 0 {
-				newRow = AllRows
-				newNumRows = AllRows
-			} else {
-				newRow = newNumRows - 1
-				newNumRows = AllRows
-			}
-		} else if newNumRows == 0 {
-			if len(res) > 1 {
-				newNumRows = AllRows
-			} else {
-				newNumRows = 1
-			}
-		}
-
-		if newColumn == 0 {
-			if newNumColumns == 0 {
-				newColumn = AllColumns
-				newNumColumns = AllColumns
-			} else {
-				newColumn = newNumColumns - 1
-				newNumColumns = AllColumns
-			}
-		} else if newNumColumns == 0 {
-			if len(res) > 1 {
-				newNumColumns = AllColumns
-			} else {
-				newNumColumns = 1
-			}
-		}
+	if match {
 		ranges := []int{newRow, newColumn, newNumRows, newNumColumns}
 		return sheetName, ranges, nil
 	}

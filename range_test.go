@@ -108,6 +108,42 @@ func TestSelectByA1Notation(t *testing.T) {
 	}
 }
 
+func TestSelectByA1NotationAllRow(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], "D:F")
+
+	if aRange.Row != 1 {
+		t.Errorf("row should be 1, but %d\n", aRange.Row)
+	}
+	if aRange.Column != 4 {
+		t.Errorf("column should be 4, but %d\n", aRange.Column)
+	}
+	if aRange.NumRows != AllRows {
+		t.Errorf("number of rows should be AllRows, but %d\n", aRange.NumRows)
+	}
+	if aRange.NumColumns != 3 {
+		t.Errorf("number of columns should be 3, but %d\n", aRange.NumColumns)
+	}
+}
+
+func TestSelectByA1NotationAllColumn(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], "5:6")
+
+	if aRange.Row != 5 {
+		t.Errorf("row should be 5, but %d\n", aRange.Row)
+	}
+	if aRange.Column != 1 {
+		t.Errorf("column should be 1, but %d\n", aRange.Column)
+	}
+	if aRange.NumRows != 2 {
+		t.Errorf("number of rows should be 2, but %d\n", aRange.NumRows)
+	}
+	if aRange.NumColumns != AllColumns {
+		t.Errorf("number of columns should be AllColumns, but %d\n", aRange.NumColumns)
+	}
+}
+
 func TestSelectByA1NotationWithSheetName(t *testing.T) {
 	file := createFile()
 	aRange := NewWithFile(file, "Sheet 2!D5:F6")
@@ -187,5 +223,49 @@ func TestGetCells(t *testing.T) {
 	}
 	if cells[0][0].Value != "D5" {
 		t.Errorf("cells[0][0] should be 'D5', but %s", cells[0][0].Value)
+	}
+}
+
+func TestFormatWithMultipleCells(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], 5, 4, 2, 3)
+	if aRange.Format(false) != "D5:F6" {
+		t.Errorf("Range.Format(false) should return 'D5:F6', but %s", aRange.Format(false))
+	}
+	if aRange.Format(true) != "Sheet 1!D5:F6" {
+		t.Errorf("Range.Format(false) should return 'Sheet 1!D5:F6', but %s", aRange.Format(false))
+	}
+}
+
+func TestFormatWithSingleCell(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], 5, 4)
+	if aRange.Format(false) != "D5" {
+		t.Errorf("Range.Format(false) should return 'D5', but %s", aRange.Format(false))
+	}
+	if aRange.Format(true) != "Sheet 1!D5" {
+		t.Errorf("Range.Format(false) should return 'Sheet 1!D5', but %s", aRange.Format(false))
+	}
+}
+
+func TestFormatWithAllRows(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], 1, 4, AllRows, 1)
+	if aRange.Format(false) != "D:D" {
+		t.Errorf("Range.Format(false) should return 'D:D', but %s", aRange.Format(false))
+	}
+	if aRange.Format(true) != "Sheet 1!D:D" {
+		t.Errorf("Range.Format(false) should return 'Sheet 1!D:D', but %s", aRange.Format(false))
+	}
+}
+
+func TestFormatWithAllColumns(t *testing.T) {
+	file := createFile()
+	aRange := New(file.Sheet["Sheet 1"], 5, 1, 1, AllColumns)
+	if aRange.Format(false) != "5:5" {
+		t.Errorf("Range.Format(false) should return '5:5', but %s", aRange.Format(false))
+	}
+	if aRange.Format(true) != "Sheet 1!5:5" {
+		t.Errorf("Range.Format(false) should return 'Sheet 1!5:5', but %s", aRange.Format(false))
 	}
 }

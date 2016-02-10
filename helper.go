@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"math"
+	"regexp"
 	"strings"
 )
 
@@ -34,10 +35,12 @@ func NumberToColumnStr(c int) string {
 	return buffer.String()
 }
 
+var columnLabelPattern *regexp.Regexp = regexp.MustCompile(`\$?([A-Z]+)`)
+
 // ColumnStrToNumber converts column label string (A, B, C.. AE, EF...) to column number.
 func ColumnStrToNumber(s string) int {
 	s = strings.ToUpper(s)
-	if !reg3.MatchString(s) {
+	if !columnLabelPattern.MatchString(s) {
 		return -1
 	}
 	result := 0
