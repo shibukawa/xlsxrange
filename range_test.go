@@ -191,21 +191,24 @@ func TestGetCell(t *testing.T) {
 	aRange.Row = 1
 	aRange.Column = 1
 
-	if aRange.GetCell(0, 0).Value != "A1" {
-		t.Errorf("aRange.GetCell(0, 0) from A1 should be A1, but %s", aRange.GetCell(0, 0).Value)
+	if aRange.GetCell().Value != "A1" {
+		t.Errorf("aRange.GetCell(0, 0) from A1 should be A1, but %s", aRange.GetCell().Value)
 	}
-	if aRange.GetCell(1, 1).Value != "B2" {
-		t.Errorf("aRange.GetCell(1, 1) from A1 should be B2, but %s", aRange.GetCell(0, 0).Value)
+	if aRange.GetCellAt(0, 0).Value != "A1" {
+		t.Errorf("aRange.GetCell(0, 0) from A1 should be A1, but %s", aRange.GetCellAt(0, 0).Value)
+	}
+	if aRange.GetCellAt(1, 1).Value != "B2" {
+		t.Errorf("aRange.GetCell(1, 1) from A1 should be B2, but %s", aRange.GetCellAt(1, 1).Value)
 	}
 
 	aRange.Row = 2
 	aRange.Column = 2
 
-	if aRange.GetCell(0, 0).Value != "B2" {
-		t.Errorf("aRange.GetCell(0, 0) from A1 should be B2, but %s", aRange.GetCell(0, 0).Value)
+	if aRange.GetCellAt(0, 0).Value != "B2" {
+		t.Errorf("aRange.GetCell(0, 0) from A1 should be B2, but %s", aRange.GetCellAt(0, 0).Value)
 	}
-	if aRange.GetCell(1, 1).Value != "C3" {
-		t.Errorf("aRange.GetCell(1, 1) from A1 should be C3, but %s", aRange.GetCell(0, 0).Value)
+	if aRange.GetCellAt(1, 1).Value != "C3" {
+		t.Errorf("aRange.GetCell(1, 1) from A1 should be C3, but %s", aRange.GetCellAt(1, 1).Value)
 	}
 }
 

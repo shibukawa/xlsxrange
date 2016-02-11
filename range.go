@@ -134,11 +134,16 @@ func (r *Range) Reset() {
 	r.NumColumns = AllColumns
 }
 
-// GetCell returns cell at relative location from selected range
+// GetCell returns left top corner cell from selected range
+func (r *Range) GetCell() *xlsx.Cell {
+	return r.GetCellAt(0, 0)
+}
+
+// GetCellAt returns cell at relative location from selected range
 //
 // Input row, col are 0 origin. If selected position is D4 and input is 1, 1,
 // this method returns cell at E5.
-func (r *Range) GetCell(refRow, refCol int) *xlsx.Cell {
+func (r *Range) GetCellAt(refRow, refCol int) *xlsx.Cell {
 	return r.Sheet.Rows[r.Row+refRow-1].Cells[r.Column+refCol-1]
 }
 
